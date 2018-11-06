@@ -12,17 +12,6 @@ let daily_lesson_default = "../daily"; //this is the default daily directory - p
 //go to the current directory of the script
 shell.cd(__dirname);
 
-// fs.readdir(fsf_git_repo + "/" + lesson_plan_directory, function(err, items) {
-//     if(err){
-//         console.log(err);
-//         return;
-//     }
-//     console.log(items);
-
-//     for (var i=0; i<items.length; i++) {
-//         console.log(items[i]);
-//     }
-// });
 
 const askForFsfRepo = (fsf_git_repo, lesson_plan_directory) => {
     prompt([
@@ -266,32 +255,8 @@ const clearDaily = (week_path, day_path, daily_path) => {
         }
     });
 };
-// const clearSubDirectory = (sub_path, callback) => {
-//     fs.readdir(sub_path, (err, files) => {
-//         if (err) throw err;
-        
-//         let files_processed = 0;
-//         let files_to_process = files.length;
-//         for (const file of files) {
-//             if(fs.lstatSync(path.join(sub_path, file)).isFile()){
-//                 fs.unlink(path.join(sub_path, file), err => {
-//                     files_processed++;
-//                     if(files_processed >= files_to_process){
-//                         callback();
-//                     }
-//                 });
-//             }
-//             else if(fs.lstatSync(path.join(sub_path, file)).isDirectory()){
-//                 clearSubDirectory(path.join(sub_path, file), () => {
-//                     files_processed++;
-//                     if(files_processed >= files_to_process){
-//                         callback();
-//                     }
-//                 });
-//             }
-//         }
-//     });
-// }
+
+
 const copyToDaily = (week_path, day_path, daily_path) => {
     // console.log("copyToDaily");
     fs.readdir(week_path, (err, things) => {
