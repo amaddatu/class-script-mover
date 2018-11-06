@@ -3,9 +3,14 @@ const path = require('path');
 const inquirer = require('inquirer');
 const fsExtra = require('fs-extra');
 const prompt = inquirer.prompt;
+const shell = require('shelljs');
 let fsf_git_repo_default = "../lesson-plans";//directory of the fsf git repository
 let lesson_plan_directory_default = "02-lesson-plans/part-time";
 let daily_lesson_default = "../daily"; //this is the default daily directory - please remember that this directory will be deleted first if chosen
+
+
+//go to the current directory of the script
+shell.cd(__dirname);
 
 // fs.readdir(fsf_git_repo + "/" + lesson_plan_directory, function(err, items) {
 //     if(err){
@@ -44,7 +49,17 @@ const askForFsfRepo = (fsf_git_repo, lesson_plan_directory) => {
         if(answers.fsf_git_repo.length !== 0){
             fsf_git_repo = answers.fsf_git_repo;
         }
-        askForLessonPlanDirectory(fsf_git_repo, lesson_plan_directory);
+        
+        // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
+        shell.cd(fsf_git_repo);
+        if (shell.exec('git pull').code !== 0) {
+            console.log("Error with git pull");
+        }
+        else{
+            shell.cd(__dirname);
+            askForLessonPlanDirectory(fsf_git_repo, lesson_plan_directory);
+        }
+        
     })
     .catch( error => {
         console.log(error);
@@ -136,9 +151,9 @@ const askForDay = (fsf_git_repo, lesson_plan_directory, week_folder) => {
         ])
         .then( answers => {
             let day = week + "/" + answers.day;
-            console.log({
-                day: day
-            })
+            // console.log({
+            //     day: day
+            // })
             askForDailyFolder(week, day);
         })
         .catch( error => {
@@ -153,21 +168,7 @@ const askForDailyFolder = (week_path, day_path) => {
         {
             name: "daily_folder",
             message: "What is the daily directory (will be deleted) ? [" + daily_folder + "]",
-            type: 'input',
-            validate: (input) => {
-                if(input.length === 0){
-                    return true;
-                }
-                else{
-                    if (fs.existsSync(input)) {
-                        return true;
-                    }
-                    else{
-                        
-
-                    }
-                }
-            }
+            type: 'input'
         }
     ])
     .then( answers => {
@@ -194,10 +195,19 @@ const confirmDailyFolderDeletion = (week_path, day_path, daily_path) => {
             return;
         }
         if(things.length > 0){
+            console.log("----------");
             console.log("These files/folders will be deleted in the daily folder: ");
+            console.log("-----");
             for(let i = 0; i < things.length; i++){
-                console.log(things[i]);
+                if(fs.lstatSync(path.join(daily_path, things[i])).isFile()){
+                    console.log("f:  " + things[i]);
+                }
+                else if(fs.lstatSync(path.join(daily_path, things[i])).isDirectory()){
+                    console.log("d:  " + things[i]);
+                }
+                
             }
+            console.log("-----");
             prompt([
                 {
                     name: 'daily_deletion',
@@ -283,7 +293,7 @@ const clearDaily = (week_path, day_path, daily_path) => {
 //     });
 // }
 const copyToDaily = (week_path, day_path, daily_path) => {
-    console.log("copyToDaily");
+    // console.log("copyToDaily");
     fs.readdir(week_path, (err, things) => {
         if(err){
             console.log(err);
@@ -301,6 +311,7 @@ const copyToDaily = (week_path, day_path, daily_path) => {
     if (!fs.existsSync(daily_day_path)){
         fs.mkdirSync(daily_day_path);
         fsExtra.copySync(day_path, daily_day_path);
+        console.log("Completed Copy");
     }
 };
 askForFsfRepo(fsf_git_repo_default, lesson_plan_directory_default);

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "yarn run start-daily",
-    "start-daily": "cd ../lesson-plans && git pull && cd ../class-scripts && node daily-lesson"
+    "start-daily": "node daily-lesson"
   },
   "author": "Anthony Maddatu",
   "license": "ISC",
@@ -14,6 +14,7 @@
     "fs": "^0.0.1-security",
     "fs-extra": "^7.0.0",
     "inquirer": "^6.2.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "shelljs": "^0.8.2"
   }
 }
