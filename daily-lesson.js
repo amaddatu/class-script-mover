@@ -115,6 +115,7 @@ class LessonMover {
                     week_folders.push(things[i]);
                 }
             }
+            week_folders.push("Done or Skip");
             // console.log(week_folders);
             prompt([
                 {
@@ -126,7 +127,13 @@ class LessonMover {
             ])
             .then( answers => {
                 // console.log(answers);
-                callback(answers.week);
+                if(answers.week !== "Done or Skip"){
+                    callback(answers.week);
+                }
+                else{
+                    callback(false);
+                }
+                
             })
             .catch( error => {
                 console.log(error);
@@ -135,6 +142,10 @@ class LessonMover {
     }
 
     askForDay(week_folder){
+        if(!week_folder){
+            console.log("Exiting");
+            return;
+        }
         this.week = this.fsf_git_repo + "/" + this.lesson_plan_directory + "/" + week_folder;
         fs.readdir(this.week, (err, things) => {
             if(err){
@@ -336,11 +347,19 @@ class LessonMover {
     }
     
     askForWeekClassActivityFolder(week_folder){
+        if(!week_folder){
+            console.log("Exiting");
+            return;
+        }
         this.week_activities = this.fsf_git_repo + "/" + this.activity_directory + "/" + week_folder;
         this.askForWeek(this.week_activities, this.askForSpecificClassActivities.bind(this), "Please select the class activities folder: ");
         // 
     };
     askForSpecificClassActivities(week_folder){
+        if(!week_folder){
+            console.log("Exiting");
+            return;
+        }
         this.week_class_activities = this.week_activities + "/" + week_folder;
         fs.readdir(this.week_class_activities, (err, things) => {
             if(err){
@@ -354,8 +373,44 @@ class LessonMover {
                     this.class_activity_folders.push(things[i]);
                 }
             }
-            console.log(this.class_activity_folders);
-            
+            //console.log(this.class_activity_folders);
+            prompt([
+                {
+                    name: 'activities_chosen',
+                    type: 'checkbox',
+                    message: "Please choose all the activities you would like to use: ",
+                    choices: this.class_activity_folders
+                }
+            ])
+            .then( answers => {
+                this.class_activities_chosen = answers.activities_chosen;
+                // console.log(answers);
+                // console.log(this);
+                this.copySpecificActivities();
+            })
+            .catch(error =>{
+                console.log(error);
+            });
+        });
+    }
+
+    copySpecificActivities(){
+        this.daily_lesson_activities = this.daily_lesson + "/" + "activities";
+        if (!fs.existsSync(this.daily_lesson_activities)){
+            fs.mkdirSync(this.daily_lesson_activities);
+        }
+        for(let i = 0; i < this.class_activities_chosen.length; i++){
+            this.copySpecificActivityToDaily(this.class_activities_chosen[i]);
+        }
+    }
+    copySpecificActivityToDaily(activity_folder){
+        let dest = this.daily_lesson_activities + "/" + activity_folder;
+        let src = this.week_class_activities + "/" + activity_folder;
+        if (!fs.existsSync(dest)){
+            fs.mkdirSync(dest);
+        }
+        fsExtra.copy(src, dest, () => {
+            console.log("Completed Copy of " + src);
         });
     }
 }
