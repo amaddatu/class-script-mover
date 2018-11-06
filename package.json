@@ -5,7 +5,8 @@
   "main": "daily-lesson.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node daily-lesson"
+    "start": "yarn run start-daily",
+    "start-daily": "cd ../lesson-plans && git pull && cd ../class-scripts && node daily-lesson"
   },
   "author": "Anthony Maddatu",
   "license": "ISC",
