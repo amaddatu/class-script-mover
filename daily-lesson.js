@@ -53,13 +53,14 @@ class LessonMover {
             
             // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
             shell.cd(this.fsf_git_repo);
-            if (shell.exec('git pull').code !== 0) {
-                console.log("Error with git pull");
-            }
-            else{
+            // // put this back after you finish debugging
+            // if (shell.exec('git pull').code !== 0) {
+            //     console.log("Error with git pull");
+            // }
+            // else{
                 shell.cd(__dirname);
                 this.askForLessonPlanDirectory();
-            }
+            // }
             
         })
         .catch( error => {
@@ -224,10 +225,10 @@ class LessonMover {
                 ])
                 .then( answers => {
                     if(answers.daily_deletion){
-                        //clearDaily(this.week, this.day, daily_path);
+                        this.clearDaily();
                     }
                     else{
-                        //askForDailyFolder(this.week, this.day);
+                        this.askForDailyFolder();
                     }
                 })
                 .catch( error => {
@@ -296,62 +297,66 @@ class LessonMover {
             fsExtra.copySync(this.day, daily_day_path);
             console.log("Completed Copy");
         }
+
+        this.askForActivityDirectory();
     };
 
+
+    askForActivityDirectory(){
+        prompt([
+            {
+                name: "activity_directory",
+                message: "What is the activity directory? [" + this.activity_directory + "]",
+                type: 'input',
+                validate: (input) => {
+                    if(input.length === 0){
+                        return true;
+                    }
+                    else{
+                        if (fs.existsSync(this.fsf_git_repo + "/" + input)) {
+                            return true;
+                        }
+                        else{
+                            return "Could not find the directory in the repo";
+                        }
+                    }
+                }
+            }
+        ])
+        .then( answers => {
+            if(answers.activity_directory.length !== 0){
+                this.activity_directory = answers.activity_directory;
+            }
+            console.log(this.activity_directory);
+            this.askForWeek(this.activity_directory, this.askForActivities.bind(this));
+        })
+        .catch( error => {
+            console.log(error);
+        });
+    }
+    
+    askForActivities(week_folder){
+        this.week_activities = this.fsf_git_repo + "/" + this.activity_directory + "/" + week_folder;
+        fs.readdir(this.week_activities, (err, things) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+    
+            this.activity_folders = [];
+            for(let i = 0; i < things.length; i++){
+                if(fs.lstatSync(this.week_activities + "/" + things[i]).isDirectory() === true){
+                    this.activity_folders.push(things[i]);
+                }
+            }
+            console.log(this.activity_folders);
+        });
+    };
 }
 
 let lm = new LessonMover(fsf_git_repo_default, lesson_plan_directory_default, daily_lesson_default, activity_directory_default);
 lm.start();
 
-// const askForActivityDirectory = (fsf_git_repo, activity_directory) => {
-//     prompt([
-//         {
-//             name: "activity_directory",
-//             message: "What is the activity directory? [" + activity_directory + "]",
-//             type: 'input',
-//             validate: (input) => {
-//                 if(input.length === 0){
-//                     return true;
-//                 }
-//                 else{
-//                     if (fs.existsSync(fsf_git_repo + "/" + input)) {
-//                         return true;
-//                     }
-//                     else{
-//                         return "Could not find the directory in the repo";
-//                     }
-//                 }
-//             }
-//         }
-//     ])
-//     .then( answers => {
-//         if(answers.activity_directory.length !== 0){
-//             activity_directory = answers.activity_directory;
-//         }
-//         console.log(activity_directory);
-//         askForWeek(fsf_git_repo, activity_directory, askForActivities);
-//     })
-//     .catch( error => {
-//         console.log(error);
-//     });
-// }
 
-// const askForActivities = (fsf_git_repo, activity_directory, week_folder) => {
-//     let week = fsf_git_repo + "/" + activity_directory + "/" + week_folder;
-//     fs.readdir(week, (err, things) => {
-//         if(err){
-//             console.log(err);
-//             return;
-//         }
-
-//         let activity_folders = [];
-//         for(let i = 0; i < things.length; i++){
-//             if(fs.lstatSync(week + "/" + things[i]).isDirectory() === true){
-//                 activity_folders.push(things[i]);
-//             }
-//         }
-//         console.log(activity_folders);
-//     });
-// };
 //askForFsfRepo(fsf_git_repo_default, lesson_plan_directory_default);
 //askForActivityDirectory(fsf_git_repo_default, activity_directory_default);
