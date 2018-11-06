@@ -328,30 +328,36 @@ class LessonMover {
                 this.activity_directory = answers.activity_directory;
             }
             console.log(this.activity_directory);
-            this.askForWeek(this.activity_directory, this.askForActivities.bind(this));
+            this.askForWeek(this.activity_directory, this.askForWeekClassActivityFolder.bind(this));
         })
         .catch( error => {
             console.log(error);
         });
     }
     
-    askForActivities(week_folder){
+    askForWeekClassActivityFolder(week_folder){
         this.week_activities = this.fsf_git_repo + "/" + this.activity_directory + "/" + week_folder;
-        fs.readdir(this.week_activities, (err, things) => {
+        this.askForWeek(this.week_activities, this.askForSpecificClassActivities.bind(this), "Please select the class activities folder: ");
+        // 
+    };
+    askForSpecificClassActivities(week_folder){
+        this.week_class_activities = this.week_activities + "/" + week_folder;
+        fs.readdir(this.week_class_activities, (err, things) => {
             if(err){
                 console.log(err);
                 return;
             }
     
-            this.activity_folders = [];
+            this.class_activity_folders = [];
             for(let i = 0; i < things.length; i++){
-                if(fs.lstatSync(this.week_activities + "/" + things[i]).isDirectory() === true){
-                    this.activity_folders.push(things[i]);
+                if(fs.lstatSync(this.week_class_activities + "/" + things[i]).isDirectory() === true){
+                    this.class_activity_folders.push(things[i]);
                 }
             }
-            console.log(this.activity_folders);
+            console.log(this.class_activity_folders);
+            
         });
-    };
+    }
 }
 
 let lm = new LessonMover(fsf_git_repo_default, lesson_plan_directory_default, daily_lesson_default, activity_directory_default);
