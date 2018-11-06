@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const inquirer = require('inquirer');
+const fsExtra = require('fs-extra');
 const prompt = inquirer.prompt;
 let fsf_git_repo_default = "../lesson-plans";//directory of the fsf git repository
 let lesson_plan_directory_default = "02-lesson-plans/part-time";
@@ -135,6 +136,9 @@ const askForDay = (fsf_git_repo, lesson_plan_directory, week_folder) => {
         ])
         .then( answers => {
             let day = week + "/" + answers.day;
+            console.log({
+                day: day
+            })
             askForDailyFolder(week, day);
         })
         .catch( error => {
@@ -227,18 +231,76 @@ const clearDaily = (week_path, day_path, daily_path) => {
         let files_processed = 0;
         let files_to_process = files.length;
         for (const file of files) {
-            fs.unlink(path.join(daily_path, file), err => {
-                if (err) throw err;
-                files_processed++;
-                if(files_processed >= files_to_process){
-                    copyToDaily(week_path, day_path, daily_path);
-                }
-            });
+            if(fs.lstatSync(path.join(daily_path, file)).isFile()){
+                fs.unlink(path.join(daily_path, file), err => {
+                    if (err) throw err;
+                    files_processed++;
+                    if(files_processed >= files_to_process){
+                        copyToDaily(week_path, day_path, daily_path);
+                    }
+                });
+            }
+            else if(fs.lstatSync(path.join(daily_path, file)).isDirectory()){
+                fsExtra.remove(path.join(daily_path, file))
+                .then( () => {
+                    files_processed++;
+                    if(files_processed >= files_to_process){
+                        copyToDaily(week_path, day_path, daily_path);
+                    }
+                })
+                .catch( error => {
+                    console.log(error);
+                })
+                ;
+            }
         }
     });
 };
+// const clearSubDirectory = (sub_path, callback) => {
+//     fs.readdir(sub_path, (err, files) => {
+//         if (err) throw err;
+        
+//         let files_processed = 0;
+//         let files_to_process = files.length;
+//         for (const file of files) {
+//             if(fs.lstatSync(path.join(sub_path, file)).isFile()){
+//                 fs.unlink(path.join(sub_path, file), err => {
+//                     files_processed++;
+//                     if(files_processed >= files_to_process){
+//                         callback();
+//                     }
+//                 });
+//             }
+//             else if(fs.lstatSync(path.join(sub_path, file)).isDirectory()){
+//                 clearSubDirectory(path.join(sub_path, file), () => {
+//                     files_processed++;
+//                     if(files_processed >= files_to_process){
+//                         callback();
+//                     }
+//                 });
+//             }
+//         }
+//     });
+// }
 const copyToDaily = (week_path, day_path, daily_path) => {
-    // console.log("copyToDaily");
-    
+    console.log("copyToDaily");
+    fs.readdir(week_path, (err, things) => {
+        if(err){
+            console.log(err);
+            return;
+        }
+
+        for(let i = 0; i < things.length; i++){
+            if(fs.lstatSync(path.join(week_path, things[i])).isFile()){
+                fsExtra.copySync(path.join(week_path, things[i]), path.join(daily_path, things[i]));
+            }
+        }
+    });
+    let day_folder = path.basename(day_path);
+    let daily_day_path = path.join(daily_path, day_folder)
+    if (!fs.existsSync(daily_day_path)){
+        fs.mkdirSync(daily_day_path);
+        fsExtra.copySync(day_path, daily_day_path);
+    }
 };
 askForFsfRepo(fsf_git_repo_default, lesson_plan_directory_default);
