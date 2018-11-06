@@ -53,14 +53,14 @@ class LessonMover {
             
             // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
             shell.cd(this.fsf_git_repo);
-            // // put this back after you finish debugging
-            // if (shell.exec('git pull').code !== 0) {
-            //     console.log("Error with git pull");
-            // }
-            // else{
+            // put this back after you finish debugging
+            if (shell.exec('git pull').code !== 0) {
+                console.log("Error with git pull");
+            }
+            else{
                 shell.cd(__dirname);
                 this.askForLessonPlanDirectory();
-            // }
+            }
             
         })
         .catch( error => {
