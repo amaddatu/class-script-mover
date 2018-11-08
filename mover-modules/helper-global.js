@@ -15,7 +15,9 @@ class HelperGlobal {
         this.daily_lesson_default = "../daily"; //this is the default daily directory - please remember that this directory will be deleted first if chosen
         this.activity_directory_default = "01-Class-Content";
         this.class_repo_default = "../class-repo";
+        this.class_repo_content_default = "class-content";
         this.class_repo_set = false;
+        this.class_repo_content_set = false;
         this.class_pull_repo_set = true; //can set to true to skip the git pull during testing
         this.fsf_git_repo_set = false;
         this.fsf_git_pull_repo_set = true; //can set to true to skip the git pull during testing
@@ -225,6 +227,61 @@ class HelperGlobal {
             callback(lesson_plan_directory);
         }
     }
+
+    /**
+     * Asks the user for the lesson plan directory in the full stack repo
+     * @param {*} class_repo This is either the location of full stack repo or the callback
+     * @param {*} callback This is a callback function
+     */
+    askForClassRepoContentDirectory(class_repo, callback){
+        if(typeof class_repo === 'undefined' || class_repo === null){
+            fsf_git_repo = this.class_repo_default;
+        }
+        if(typeof class_repo === 'function'){
+            callback = class_repo;
+            class_repo = this.class_repo_default;
+        }
+
+        let class_repo_content = this.class_repo_content_default;
+        if(!this.class_repo_content_set){
+            prompt([
+                {
+                    name: "class_repo_content",
+                    message: "What is the lesson plan directory? [" + class_repo_content + "]",
+                    type: 'input',
+                    validate: (input) => {
+                        if(input.length === 0){
+                            return true;
+                        }
+                        else{
+                            if (fs.existsSync(class_repo + "/" + input)) {
+                                return true;
+                            }
+                            else{
+                                return "Could not find the directory in the class repo";
+                            }
+                        }
+                    }
+                }
+            ])
+            .then( answers => {
+                if(answers.class_repo_content.length !== 0){
+                    class_repo_content = answers.class_repo_content;
+                    this.class_repo_content_default = class_repo_content;
+                }
+                //this.askForWeek(lesson_plan_directory, this.askForDay.bind(this));
+                this.class_repo_content_set = true;
+                callback(class_repo_content);
+            })
+            .catch( error => {
+                console.log(error);
+            });
+        }
+        else{
+            callback(class_repo_content);
+        }
+    }
+
     /**
      * Asks the user for the lesson plan directory in the full stack repo
      * @param {*} fsf_git_repo This is either the location of full stack repo or the callback

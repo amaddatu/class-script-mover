@@ -13,4 +13,4 @@ const prompt = inquirer.prompt;
 shell.cd(__dirname);
 
 lessonMover.start(hg());
-// classActivityRepoUpdater.start(hg());
+classActivityRepoUpdater.start(hg());
