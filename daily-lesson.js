@@ -43,8 +43,8 @@ class HelperGlobal {
                     fsf_git_repo = answers.fsf_git_repo;
                     // set global variable
                     fsf_git_repo_default = fsf_git_repo;
-                    fsf_git_repo_set = true;
                 }
+                fsf_git_repo_set = true;
                 
                 // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
                 shell.cd(fsf_git_repo);
@@ -107,6 +107,7 @@ class HelperGlobal {
             .then( answers => {
                 if(answers.lesson_plan_directory.length !== 0){
                     lesson_plan_directory = answers.lesson_plan_directory;
+                    lesson_plan_directory_default = lesson_plan_directory;
                 }
                 //this.askForWeek(lesson_plan_directory, this.askForDay.bind(this));
                 lesson_plan_directory_set = true;
