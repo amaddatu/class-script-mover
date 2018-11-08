@@ -24,6 +24,13 @@ class ClassActivityRepoUpdater {
     askForGitRepo(){
         this.hg.askForFsfRepo( fsf_git_repo => {
             this.fsf_git_repo = fsf_git_repo;
+            this.askForActivityDirectory();
+        });
+    }
+    
+    askForActivityDirectory(){
+        this.hg.askForActivityDirectory( activity_directory => {
+            this.activity_directory = activity_directory;
             this.askForClassRepoDirectory();
         });
     }
