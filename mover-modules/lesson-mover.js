@@ -32,50 +32,50 @@ class LessonMover {
     askForLessonPlanDirectory(){
         this.hg.askForLessonPlanDirectory(this.fsf_git_repo, (lesson_plan_directory) => {
             this.lesson_plan_directory = lesson_plan_directory;
-            this.askForWeek(this.lesson_plan_directory, this.askForDay.bind(this));
+            this.hg.askForWeek(this.fsf_git_repo, this.lesson_plan_directory, this.askForDay.bind(this));
         });
     };
 
-    askForWeek(weekly_directory, callback, message){
-        if(typeof message === 'undefined'){
-            message = "Please select a week: "
-        }
-        fs.readdir(this.fsf_git_repo + "/" + weekly_directory, (err, things) => {
-            if(err){
-                console.log(err);
-                return;
-            }
-            let week_folders = [];
-            for(let i = 0; i < things.length; i++){
-                if(fs.lstatSync(this.fsf_git_repo + "/" + weekly_directory + "/" + things[i]).isDirectory() === true){
-                    week_folders.push(things[i]);
-                }
-            }
-            week_folders.push("Done or Skip");
-            // console.log(week_folders);
-            prompt([
-                {
-                    name: 'week',
-                    type: 'list',
-                    message: message,
-                    choices: week_folders
-                }
-            ])
-            .then( answers => {
-                // console.log(answers);
-                if(answers.week !== "Done or Skip"){
-                    callback(answers.week);
-                }
-                else{
-                    callback(false);
-                }
+    // askForWeek(weekly_directory, callback, message){
+    //     if(typeof message === 'undefined'){
+    //         message = "Please select a week: "
+    //     }
+    //     fs.readdir(this.fsf_git_repo + "/" + weekly_directory, (err, things) => {
+    //         if(err){
+    //             console.log(err);
+    //             return;
+    //         }
+    //         let week_folders = [];
+    //         for(let i = 0; i < things.length; i++){
+    //             if(fs.lstatSync(this.fsf_git_repo + "/" + weekly_directory + "/" + things[i]).isDirectory() === true){
+    //                 week_folders.push(things[i]);
+    //             }
+    //         }
+    //         week_folders.push("Done or Skip");
+    //         // console.log(week_folders);
+    //         prompt([
+    //             {
+    //                 name: 'week',
+    //                 type: 'list',
+    //                 message: message,
+    //                 choices: week_folders
+    //             }
+    //         ])
+    //         .then( answers => {
+    //             // console.log(answers);
+    //             if(answers.week !== "Done or Skip"){
+    //                 callback(answers.week);
+    //             }
+    //             else{
+    //                 callback(false);
+    //             }
                 
-            })
-            .catch( error => {
-                console.log(error);
-            });
-        });
-    }
+    //         })
+    //         .catch( error => {
+    //             console.log(error);
+    //         });
+    //     });
+    // }
 
     askForDay(week_folder){
         if(!week_folder){
@@ -248,37 +248,10 @@ class LessonMover {
         this.askForActivityDirectory();
     };
 
-
     askForActivityDirectory(){
-        prompt([
-            {
-                name: "activity_directory",
-                message: "What is the activity directory? [" + this.activity_directory + "]",
-                type: 'input',
-                validate: (input) => {
-                    if(input.length === 0){
-                        return true;
-                    }
-                    else{
-                        if (fs.existsSync(this.fsf_git_repo + "/" + input)) {
-                            return true;
-                        }
-                        else{
-                            return "Could not find the directory in the repo";
-                        }
-                    }
-                }
-            }
-        ])
-        .then( answers => {
-            if(answers.activity_directory.length !== 0){
-                this.activity_directory = answers.activity_directory;
-            }
-            console.log(this.activity_directory);
-            this.askForWeek(this.activity_directory, this.askForWeekClassActivityFolder.bind(this));
-        })
-        .catch( error => {
-            console.log(error);
+        this.hg.askForActivityDirectory( (activity_directory) => {
+            this.activity_directory = activity_directory;
+            this.hg.askForWeek(this.fsf_git_repo, this.activity_directory, this.askForWeekClassActivityFolder.bind(this));
         });
     }
     
@@ -288,7 +261,7 @@ class LessonMover {
             return;
         }
         this.week_activities = this.fsf_git_repo + "/" + this.activity_directory + "/" + week_folder;
-        this.askForWeek(this.week_activities, this.askForSpecificClassActivities.bind(this), "Please select the class activities folder: ");
+        this.hg.askForWeek(this.fsf_git_repo, this.week_activities, this.askForSpecificClassActivities.bind(this), "Please select the class activities folder: ");
         // 
     };
     askForSpecificClassActivities(week_folder){

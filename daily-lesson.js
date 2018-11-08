@@ -5,6 +5,7 @@ const fsExtra = require('fs-extra');
 const shell = require('shelljs');
 const hg = require('./mover-modules/helper-global');
 const lessonMover = require('./mover-modules/lesson-mover');
+const classActivityRepoUpdater = require('./mover-modules/class-activity-repo-updater');
 const prompt = inquirer.prompt;
 
 
@@ -12,3 +13,4 @@ const prompt = inquirer.prompt;
 shell.cd(__dirname);
 
 lessonMover.start(hg());
+// classActivityRepoUpdater.start(hg());
