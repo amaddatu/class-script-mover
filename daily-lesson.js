@@ -141,46 +141,6 @@ class LessonMover {
             this.fsf_git_repo = fsf_git_repo;
             this.askForLessonPlanDirectory();
         });
-        // prompt([
-        //     {
-        //         name: "fsf_git_repo",
-        //         message: "What is the fsf repo directory? [" + this.fsf_git_repo + "]",
-        //         type: 'input',
-        //         validate: (input) => {
-        //             if(input.length === 0){
-        //                 return true;
-        //             }
-        //             else{
-        //                 if (fs.existsSync(input)) {
-        //                     return true;
-        //                 }
-        //                 else{
-        //                     return "Could not find the repo directory";
-        //                 }
-        //             }
-        //         }
-        //     }
-        // ])
-        // .then( answers => {
-        //     if(answers.fsf_git_repo.length !== 0){
-        //         this.fsf_git_repo = answers.fsf_git_repo;
-        //     }
-            
-        //     // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
-        //     shell.cd(this.fsf_git_repo);
-        //     // put this back after you finish debugging
-        //     if (shell.exec('git pull').code !== 0) {
-        //         console.log("Error with git pull");
-        //     }
-        //     else{
-        //         shell.cd(__dirname);
-        //         this.askForLessonPlanDirectory();
-        //     }
-            
-        // })
-        // .catch( error => {
-        //     console.log(error);
-        // });
     }
 
     askForLessonPlanDirectory(){
@@ -188,35 +148,6 @@ class LessonMover {
             this.lesson_plan_directory = lesson_plan_directory;
             this.askForWeek(this.lesson_plan_directory, this.askForDay.bind(this));
         });
-        // prompt([
-        //     {
-        //         name: "lesson_plan_directory",
-        //         message: "What is the lesson plan directory? [" + this.lesson_plan_directory + "]",
-        //         type: 'input',
-        //         validate: (input) => {
-        //             if(input.length === 0){
-        //                 return true;
-        //             }
-        //             else{
-        //                 if (fs.existsSync(this.fsf_git_repo + "/" + input)) {
-        //                     return true;
-        //                 }
-        //                 else{
-        //                     return "Could not find the directory in the repo";
-        //                 }
-        //             }
-        //         }
-        //     }
-        // ])
-        // .then( answers => {
-        //     if(answers.lesson_plan_directory.length !== 0){
-        //         this.lesson_plan_directory = answers.lesson_plan_directory;
-        //     }
-        //     this.askForWeek(this.lesson_plan_directory, this.askForDay.bind(this));
-        // })
-        // .catch( error => {
-        //     console.log(error);
-        // });
     };
 
     askForWeek(weekly_directory, callback, message){
