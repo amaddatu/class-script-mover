@@ -4,20 +4,25 @@ const inquirer = require('inquirer');
 const fsExtra = require('fs-extra');
 const prompt = inquirer.prompt;
 const shell = require('shelljs');
-let fsf_git_repo_default = "../lesson-plans";//directory of the fsf git repository
-let lesson_plan_directory_default = "02-lesson-plans/part-time";
-let daily_lesson_default = "../daily"; //this is the default daily directory - please remember that this directory will be deleted first if chosen
-let activity_directory_default = "01-Class-Content";
-let fsf_git_repo_set = false;
-let fsf_git_pull_repo_set = false;
-let lesson_plan_directory_set = false;
+
 
 //go to the current directory of the script
 shell.cd(__dirname);
 
 class HelperGlobal {
-    static askForFsfRepo(fsf_git_repo, callback){
-        if(!fsf_git_repo_set){
+    constructor(){
+        this.fsf_git_repo_default = "../lesson-plans" //directory of the fsf git repository
+        this.lesson_plan_directory_default = "02-lesson-plans/part-time";
+        this.daily_lesson_default = "../daily"; //this is the default daily directory - please remember that this directory will be deleted first if chosen
+        this.activity_directory_default = "01-Class-Content";
+        this.fsf_git_repo_set = false;
+        this.fsf_git_pull_repo_set = false;
+        this.lesson_plan_directory_set = false;
+    }
+    
+
+    askForFsfRepo(fsf_git_repo, callback){
+        if(!this.fsf_git_repo_set){
             prompt([
                 {
                     name: "fsf_git_repo",
@@ -42,9 +47,9 @@ class HelperGlobal {
                 if(answers.fsf_git_repo.length !== 0){
                     fsf_git_repo = answers.fsf_git_repo;
                     // set global variable
-                    fsf_git_repo_default = fsf_git_repo;
+                    this.fsf_git_repo_default = fsf_git_repo;
                 }
-                fsf_git_repo_set = true;
+                this.fsf_git_repo_set = true;
                 
                 // trying to replicate cd ../lesson-plans && git pull && cd ../class-scripts &&
                 shell.cd(fsf_git_repo);
@@ -54,10 +59,10 @@ class HelperGlobal {
                 }
                 else{
                     shell.cd(__dirname);
-                    fsf_git_pull_repo_set = true;
+                    this.fsf_git_pull_repo_set = true;
                     //this.askForLessonPlanDirectory();
-                    callback(fsf_git_repo);
                 }
+                callback(fsf_git_repo);
                 
             })
             .catch( error => {
@@ -65,7 +70,7 @@ class HelperGlobal {
             });
         }
         else{
-            if(!fsf_git_pull_repo_set){
+            if(!this.fsf_git_pull_repo_set){
                 shell.cd(fsf_git_repo);
                 // put this back after you finish debugging
                 if (shell.exec('git pull').code !== 0) {
@@ -73,7 +78,7 @@ class HelperGlobal {
                 }
                 else{
                     shell.cd(__dirname);
-                    fsf_git_pull_repo_set = true;
+                    this.fsf_git_pull_repo_set = true;
                     callback(fsf_git_repo);
                 }
             }
@@ -82,8 +87,8 @@ class HelperGlobal {
             }
         }
     }
-    static askForLessonPlanDirectory(fsf_git_repo, lesson_plan_directory, callback){
-        if(!lesson_plan_directory_set){
+    askForLessonPlanDirectory(fsf_git_repo, lesson_plan_directory, callback){
+        if(!this.lesson_plan_directory_set){
             prompt([
                 {
                     name: "lesson_plan_directory",
@@ -107,10 +112,10 @@ class HelperGlobal {
             .then( answers => {
                 if(answers.lesson_plan_directory.length !== 0){
                     lesson_plan_directory = answers.lesson_plan_directory;
-                    lesson_plan_directory_default = lesson_plan_directory;
+                    this.lesson_plan_directory_default = lesson_plan_directory;
                 }
                 //this.askForWeek(lesson_plan_directory, this.askForDay.bind(this));
-                lesson_plan_directory_set = true;
+                this.lesson_plan_directory_set = true;
                 callback(lesson_plan_directory);
             })
             .catch( error => {
@@ -122,6 +127,8 @@ class HelperGlobal {
         }
     }
 }
+
+let hg = new HelperGlobal();
 
 class LessonMover {
     constructor(fsf_git_repo_default, lesson_plan_directory_default, daily_lesson_default, activity_directory_default){
@@ -137,14 +144,14 @@ class LessonMover {
         this.askForFsfRepo();
     };
     askForFsfRepo(){
-        HelperGlobal.askForFsfRepo(this.fsf_git_repo, (fsf_git_repo) => {
+        hg.askForFsfRepo(this.fsf_git_repo, (fsf_git_repo) => {
             this.fsf_git_repo = fsf_git_repo;
             this.askForLessonPlanDirectory();
         });
     }
 
     askForLessonPlanDirectory(){
-        HelperGlobal.askForLessonPlanDirectory(this.fsf_git_repo, this.lesson_plan_directory, (lesson_plan_directory) => {
+        hg.askForLessonPlanDirectory(this.fsf_git_repo, this.lesson_plan_directory, (lesson_plan_directory) => {
             this.lesson_plan_directory = lesson_plan_directory;
             this.askForWeek(this.lesson_plan_directory, this.askForDay.bind(this));
         });
@@ -465,7 +472,7 @@ class LessonMover {
     }
 }
 
-let lm = new LessonMover(fsf_git_repo_default, lesson_plan_directory_default, daily_lesson_default, activity_directory_default);
+let lm = new LessonMover(hg.fsf_git_repo_default, hg.lesson_plan_directory_default, hg.daily_lesson_default, hg.activity_directory_default);
 lm.start();
 
 
