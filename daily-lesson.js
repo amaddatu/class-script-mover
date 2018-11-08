@@ -12,6 +12,3 @@ const prompt = inquirer.prompt;
 shell.cd(__dirname);
 
 lessonMover.start(hg());
-
-//askForFsfRepo(fsf_git_repo_default, lesson_plan_directory_default);
-//askForActivityDirectory(fsf_git_repo_default, activity_directory_default);

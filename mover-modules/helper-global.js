@@ -20,8 +20,12 @@ class HelperGlobal {
         this.basedir = path.dirname(__dirname); //since we are in a sub-folder, we must use this to get the parent directory
     }
     
-
-    askForFsfRepo(fsf_git_repo, callback){
+    /**
+     * This will ask the user for the location of the git repo folder
+     * @param {*} callback This is a callback function
+     */
+    askForFsfRepo(callback){
+        let fsf_git_repo = this.fsf_git_repo_default;
         if(!this.fsf_git_repo_set){
             prompt([
                 {
@@ -87,7 +91,21 @@ class HelperGlobal {
             }
         }
     }
-    askForLessonPlanDirectory(fsf_git_repo, lesson_plan_directory, callback){
+    /**
+     * Asks the user for the lesson plan directory in the full stack repo
+     * @param {*} fsf_git_repo This is either the location of full stack repo or the callback
+     * @param {*} callback This is a callback function
+     */
+    askForLessonPlanDirectory(fsf_git_repo, callback){
+        if(typeof fsf_git_repo === 'undefined' || fsf_git_repo === null){
+            fsf_git_repo = this.fsf_git_repo_default;
+        }
+        if(typeof fsf_git_repo === 'function'){
+            callback = fsf_git_repo;
+            fsf_git_repo = this.fsf_git_repo_default;
+        }
+
+        let lesson_plan_directory = this.lesson_plan_directory_default;
         if(!this.lesson_plan_directory_set){
             prompt([
                 {

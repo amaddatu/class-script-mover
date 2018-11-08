@@ -13,8 +13,6 @@ class LessonMover {
      */
     constructor(hg){
         this.hg = hg;
-        this.fsf_git_repo = hg.fsf_git_repo_default;
-        this.lesson_plan_directory = hg.lesson_plan_directory_default;
         this.daily_lesson = hg.daily_lesson_default;
         this.activity_directory = hg.activity_directory_default;
     }
@@ -25,14 +23,14 @@ class LessonMover {
         this.askForFsfRepo();
     };
     askForFsfRepo(){
-        this.hg.askForFsfRepo(this.fsf_git_repo, (fsf_git_repo) => {
+        this.hg.askForFsfRepo((fsf_git_repo) => {
             this.fsf_git_repo = fsf_git_repo;
             this.askForLessonPlanDirectory();
         });
     }
 
     askForLessonPlanDirectory(){
-        this.hg.askForLessonPlanDirectory(this.fsf_git_repo, this.lesson_plan_directory, (lesson_plan_directory) => {
+        this.hg.askForLessonPlanDirectory(this.fsf_git_repo, (lesson_plan_directory) => {
             this.lesson_plan_directory = lesson_plan_directory;
             this.askForWeek(this.lesson_plan_directory, this.askForDay.bind(this));
         });
