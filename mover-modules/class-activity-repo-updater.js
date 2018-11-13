@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const inquirer = require('inquirer');
 const fsExtra = require('fs-extra');
-// import shell from 'shelljs';
+const shell = require('shelljs');
 const prompt = inquirer.prompt;
 
 
@@ -90,7 +90,8 @@ class ClassActivityRepoUpdater {
     copySpecificActivities(){
         this.class_content_activity_parent = path.join( this.class_repo, this.class_repo_content, this.current_week, this.current_week_inner);
         if (!fs.existsSync(this.class_content_activity_parent)){
-            fs.mkdirSync(this.class_content_activity_parent);
+            //fs.mkdirSync(this.class_content_activity_parent);
+            shell.mkdir('-p', this.class_content_activity_parent);
         }
         for(let i = 0; i < this.class_activities_chosen.length; i++){
             this.copySpecificActivityToDaily(this.class_activities_chosen[i]);
