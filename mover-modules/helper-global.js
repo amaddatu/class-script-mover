@@ -18,9 +18,9 @@ class HelperGlobal {
         this.class_repo_content_default = "class-content";
         this.class_repo_set = false;
         this.class_repo_content_set = false;
-        this.class_pull_repo_set = true; //can set to true to skip the git pull during testing
+        this.class_pull_repo_set = false; //can set to true to skip the git pull during testing
         this.fsf_git_repo_set = false;
-        this.fsf_git_pull_repo_set = true; //can set to true to skip the git pull during testing
+        this.fsf_git_pull_repo_set = false; //can set to true to skip the git pull during testing
         this.lesson_plan_directory_set = false;
         this.activity_directory_set = false;
         this.basedir = path.dirname(__dirname); //since we are in a sub-folder, we must use this to get the parent directory
