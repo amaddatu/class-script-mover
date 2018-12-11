@@ -108,6 +108,25 @@ class ClassActivityRepoUpdater {
         fsExtra.copy(src, dest, () => {
             console.log("Completed Copy of " + src);
         });
+        let unsolved = path.join(src, "Unsolved");
+        let instructor = path.join(dest, "Instructor");
+        // if we have an unsolved directory... make an instructor directory and copy contents to Instructor Directory
+        if(fs.existsSync(unsolved)) {
+            if (!fs.existsSync(instructor)){
+                fs.mkdirSync(instructor);
+            }
+            fsExtra.copy(unsolved, instructor, () => {
+                console.log("Completed Instructor Copy of " + src);
+            });
+        }
+        else{
+            if (!fs.existsSync(instructor)){
+                fs.mkdirSync(instructor);
+            }
+            fsExtra.copy(src, instructor, () => {
+                console.log("Completed Instructor Copy of " + src);
+            });
+        }
     }
 
     
