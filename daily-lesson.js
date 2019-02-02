@@ -12,5 +12,5 @@ const prompt = inquirer.prompt;
 //go to the current directory of the script
 shell.cd(__dirname);
 
-lessonMover.start(hg());
+//lessonMover.start(hg());
 classActivityRepoUpdater.start(hg());
